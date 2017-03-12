@@ -1,0 +1,8 @@
+{
+  "query_account_info" : true,
+  "gmail_account_info" : {
+    "username": "",
+    "password": ""
+  },
+  "last_time_processed": null
+}
