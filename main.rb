@@ -4,6 +4,7 @@ class Main
   require 'gmail'
   require 'highline'
 
+  # Entry point for the app
   def self.main(debug=false)
     file_name = debug ? 'developmentSettings.json' : 'settings.json'
 
@@ -45,14 +46,13 @@ class Main
         end
       end
 
-      gmail.inbox.find(:unread).each do |email|
-        puts email.subject
-
-        puts email.message
+      gmail.inbox.emails(:unread, :format => 'minimal').each do |email|
+        handle_email(email,debug)
       end
     end
   end
 
+  # Validation of the JSON that we use for settings
   def self.verify_json(json, debug)
     if debug
       puts 'calling verify'
@@ -65,6 +65,32 @@ class Main
         raise 'query_account_info  is true but gmail_account_info password is empty'
       end
   end
+
+  # So the actual message in the body of the email seems to be wrapped around a string that begins with --
+  # and ends with the same string. They're on their own line so I'm going to separate it that way.
+  def self.handle_email(email,debug)
+    body_lines =  email.body.to_s.split("\n")
+    first_line = body_lines[0]
+    body_lines.slice!(0,2)
+    body_end_index = get_body_end_index(body_lines, first_line)
+    body_lines.slice!(body_end_index,body_lines.length.to_i)
+    if debug
+      puts email.subject
+      puts body_lines
+    else
+      email.read!
+    end
+
+  end
+
+  # Finding the matching string that is in the beginning of the body of the email message
+  def self.get_body_end_index(body_array, first_line)
+    index_array = body_array.map.with_index {|a, i| a == first_line ? i : nil}.compact
+    if index_array.length == 0
+      raise 'Second line of email end not found'
+    end
+    return index_array[0]-1
+  end
 end
 
-Main.main(true)
+Main.main(false)
