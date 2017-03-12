@@ -13,8 +13,7 @@ class Main
     file.close
 
     json = JSON.parse(data)
-
-
+    
     username = json['gmail_account_info']['username']
     password = json['gmail_account_info']['password']
 
