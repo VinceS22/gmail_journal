@@ -45,8 +45,10 @@ class Main
         end
       end
 
-      gmail.logout
-
+      gmail.inbox.find(:unread).each do |email|
+        puts email.message
+        puts email.methods.sort!
+      end
     end
   end
 
