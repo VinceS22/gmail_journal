@@ -46,8 +46,9 @@ class Main
       end
 
       gmail.inbox.find(:unread).each do |email|
+        puts email.subject
+
         puts email.message
-        puts email.methods.sort!
       end
     end
   end
